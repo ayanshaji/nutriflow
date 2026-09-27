@@ -6,7 +6,7 @@ pipeline {
 
         AWS_REGION = 'ap-south-1'
 
-        ECR_REGISTRY = 'YOUR_AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com'
+        ECR_REGISTRY = '024757002695.dkr.ecr.ap-south-1.amazonaws.com'
 
         BACKEND_REPO = 'nutriflow-backend'
         FRONTEND_REPO = 'nutriflow-frontend'
@@ -69,7 +69,7 @@ pipeline {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
 
                     sh '''
-                        sonar-scanner \
+                        sonarscanner \
                         -Dsonar.projectKey=nutriflow \
                         -Dsonar.projectName=NutriFlow \
                         -Dsonar.sources=backend,frontend \
