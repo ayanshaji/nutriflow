@@ -64,21 +64,23 @@ pipeline {
         // 3. SONARQUBE
         // =====================================================
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
+       stage('SonarQube Analysis') {
+    steps {
+        script {
+            def scannerHome = tool 'sonarscanner'
 
-                    sh '''
-                        sonarscanner \
-                        -Dsonar.projectKey=nutriflow \
-                        -Dsonar.projectName=NutriFlow \
-                        -Dsonar.sources=backend,frontend \
-                        -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/public/**
-                    '''
-                }
+            withSonarQubeEnv('sonarqube') {
+                sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.projectKey=nutriflow \
+                    -Dsonar.projectName=NutriFlow \
+                    -Dsonar.sources=backend,frontend \
+                    -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/public/**
+                """
             }
         }
-
+    }
+}
 
         // =====================================================
         // 4. DOCKER BUILD - BACKEND
