@@ -228,6 +228,7 @@ stage('Create ECR Repositories') {
         }
     }
 }
+    }
 
 
     // =========================================================
@@ -250,4 +251,4 @@ stage('Create ECR Repositories') {
         }
     }
 }
-}
+
