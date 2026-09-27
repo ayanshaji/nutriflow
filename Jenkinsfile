@@ -207,22 +207,27 @@ stage('Create ECR Repositories') {
         // 11. PUSH UPDATED MANIFEST TO GIT
         // =====================================================
 
-        stage('Push Updated Manifest') {
-            steps {
+       stage('Push Updated Manifest') {
+    steps {
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'git-hub',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_TOKEN'
+            )
+        ]) {
+            sh '''
+                git config user.name "Jenkins"
+                git config user.email "jenkins@localhost"
 
-                sh '''
-                    git config user.name "Jenkins"
-                    git config user.email "jenkins@localhost"
+                git add k8s/deployment.yaml
+                git commit -m "Update NutriFlow image tags [skip ci]" || true
 
-                    git add k8s/deployment.yaml
-
-                    git commit -m "Update NutriFlow image tags [skip ci]" || true
-
-                    git push origin HEAD:main
-                '''
-            }
+                git push https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/ayanshaji/nutriflow.git HEAD:main
+            '''
         }
     }
+}
 
 
     // =========================================================
