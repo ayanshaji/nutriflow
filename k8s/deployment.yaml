@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ECR_BACKEND_IMAGE
+          image: 024757002695.dkr.ecr.ap-south-1.amazonaws.com/nutriflow-backend:13
           imagePullPolicy: Always
 
           ports:
@@ -89,7 +89,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ECR_FRONTEND_IMAGE
+          image: 024757002695.dkr.ecr.ap-south-1.amazonaws.com/nutriflow-frontend:13
           imagePullPolicy: Always
 
           ports:
