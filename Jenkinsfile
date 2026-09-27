@@ -83,7 +83,31 @@ pipeline {
 }
 
         // =====================================================
-        // 4. DOCKER BUILD - BACKEND
+// 4. CREATE ECR REPOSITORIES
+// =====================================================
+
+stage('Create ECR Repositories') {
+    steps {
+        sh '''
+            aws ecr describe-repositories \
+              --repository-names ${BACKEND_REPO} \
+              --region ${AWS_REGION} \
+            || aws ecr create-repository \
+              --repository-name ${BACKEND_REPO} \
+              --region ${AWS_REGION}
+
+            aws ecr describe-repositories \
+              --repository-names ${FRONTEND_REPO} \
+              --region ${AWS_REGION} \
+            || aws ecr create-repository \
+              --repository-name ${FRONTEND_REPO} \
+              --region ${AWS_REGION}
+        '''
+    }
+}
+
+        // =====================================================
+        // 5. DOCKER BUILD - BACKEND
         // =====================================================
 
         stage('Build Backend Image') {
@@ -99,7 +123,7 @@ pipeline {
 
 
         // =====================================================
-        // 5. DOCKER BUILD - FRONTEND
+        // 6. DOCKER BUILD - FRONTEND
         // =====================================================
 
         stage('Build Frontend Image') {
@@ -115,7 +139,7 @@ pipeline {
 
 
         // =====================================================
-        // 6. LOGIN TO ECR
+        // 7. LOGIN TO ECR
         // =====================================================
 
         stage('Login to ECR') {
@@ -132,7 +156,7 @@ pipeline {
 
 
         // =====================================================
-        // 7. PUSH BACKEND IMAGE
+        // 8. PUSH BACKEND IMAGE
         // =====================================================
 
         stage('Push Backend Image') {
@@ -146,7 +170,7 @@ pipeline {
 
 
         // =====================================================
-        // 8. PUSH FRONTEND IMAGE
+        // 9. PUSH FRONTEND IMAGE
         // =====================================================
 
         stage('Push Frontend Image') {
@@ -160,7 +184,7 @@ pipeline {
 
 
         // =====================================================
-        // 9. UPDATE KUBERNETES MANIFEST
+        // 10. UPDATE KUBERNETES MANIFEST
         // =====================================================
 
         stage('Update Kubernetes Manifest') {
@@ -180,7 +204,7 @@ pipeline {
 
 
         // =====================================================
-        // 10. PUSH UPDATED MANIFEST TO GIT
+        // 11. PUSH UPDATED MANIFEST TO GIT
         // =====================================================
 
         stage('Push Updated Manifest') {
