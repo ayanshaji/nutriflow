@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nutriflow
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nutriflow-backend
+  namespace: nutriflow
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nutriflow-backend
+  template:
+    metadata:
+      labels:
+        app: nutriflow-backend
+    spec:
+      containers:
+        - name: backend
+          image: ECR_BACKEND_IMAGE
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8000
+
+          env:
+            - name: PORT
+              value: "8000"
+
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: nutriflow-secrets
+                  key: MONGO_URI
+
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nutriflow-secrets
+                  key: GEMINI_API_KEY
+
+          readinessProbe:
+            httpGet:
+              path: /nutriflow
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /nutriflow
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nutriflow-backend
+  namespace: nutriflow
+spec:
+  type: ClusterIP
+  selector:
+    app: nutriflow-backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nutriflow-frontend
+  namespace: nutriflow
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nutriflow-frontend
+  template:
+    metadata:
+      labels:
+        app: nutriflow-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ECR_FRONTEND_IMAGE
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nutriflow-frontend
+  namespace: nutriflow
+spec:
+  type: LoadBalancer
+  selector:
+    app: nutriflow-frontend
+  ports:
+    - port: 80
+      targetPort: 80
